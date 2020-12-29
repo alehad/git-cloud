@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>AH4 Hello World</title>
+<title>AH4 Hello World Test App</title>
 </head>
 <body>
 <b><% out.println("Test page"); %></b>
