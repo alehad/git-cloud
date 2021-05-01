@@ -24,6 +24,7 @@ public class SimpleDatabase implements IMessageStore {
 		// initiate message list with couple of messages
 		messages.add(new Message(1, "hello!"));
 		messages.add(new Message(2, "hi there!"));
+		messages.add(new Message(3, "yuhuuu!"));  // very important change! : )
 	}
 
 	@Override
