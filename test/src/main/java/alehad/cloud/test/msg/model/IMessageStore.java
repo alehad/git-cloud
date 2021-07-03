@@ -8,11 +8,11 @@ public interface IMessageStore {
 	
 	public List<Message> getMessages();
 	
-	public Message getMessage(long id);
+	public Message getMessage(int id);
 	
 	public Message createMessage(Message msg);
 
-	public Message updateMessage(long id, Message msg);
+	public Message updateMessage(int id, Message msg);
 
-	public void deleteMessage(long id);
+	public void deleteMessage(int id);
 }
