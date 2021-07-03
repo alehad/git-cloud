@@ -1,6 +1,7 @@
 package alehad.cloud.test.msg.db;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.bson.Document;
@@ -20,6 +21,7 @@ import static com.mongodb.client.model.Updates.*;
 
 import alehad.cloud.test.msg.model.IMessageStore;
 import alehad.cloud.test.msg.model.Message;
+import alehad.cloud.test.msg.model.StoredMessage;
 
 public class MongoDatabaseImpl implements IMessageStore {
 
@@ -32,11 +34,12 @@ public class MongoDatabaseImpl implements IMessageStore {
 	private static MongoDatabase mongodb;
 	private static MongoCollection<Document> mongodbCollection;
 	
-	private static String _mongodbName = "MessengerDB";
+	private static String _mongodbName = "MessengerDBv2";
 	private static String _mongodbCollectionName = "messages";
 	
 	private static String _msgId = "msgId";
-	private static String _msg = "msg";
+	private static String _msg   = "msg";
+	private static String _auth  = "author";
 
 	
 	public static MongoDatabaseImpl getInstance() {
@@ -66,11 +69,6 @@ public class MongoDatabaseImpl implements IMessageStore {
 		if (createCollection) {
 			mongodb.createCollection(_mongodbCollectionName); // create a table -- in Mongo terms that is a Collection
 			mongodbCollection = mongodb.getCollection(_mongodbCollectionName);
-			
-			Document document = new Document();
-			document.put(_msgId, 1);
-			document.put(_msg, "hey mongo!");
-			mongodbCollection.insertOne(document);
 		}
 		else {
 			mongodbCollection = mongodb.getCollection(_mongodbCollectionName);
@@ -78,9 +76,9 @@ public class MongoDatabaseImpl implements IMessageStore {
 	}
 	
 	@Override
-	public List<Message> getMessages() {
+	public List<StoredMessage> getMessages() {
 
-		List<Message> messages = new ArrayList<Message>();
+		List<StoredMessage> messages = new ArrayList<StoredMessage>();
 		
 		FindIterable<Document> iterable = mongodbCollection.find();
 		MongoCursor<Document> cursor = iterable.iterator();
@@ -88,24 +86,23 @@ public class MongoDatabaseImpl implements IMessageStore {
 		while (cursor.hasNext()) {
 			Document doc = cursor.next();
 			
-			if (doc.containsKey(_msgId) && doc.containsKey(_msg)) {
-				Message msg = new Message();
-				int id = doc.getInteger(_msgId);
-				msg.setId(id);
-				msg.setMessage(doc.getString(_msg));
-				messages.add(msg);
+			if (doc.containsKey(_msgId)) {
+				messages.add(new StoredMessage(doc.getLong(_msgId), doc.getString(_msg), doc.getString(_auth)));
 			}
 		}
+
+		Collections.sort(messages);
+
 		return messages;
 	}
 
 	@Override
 	public Message getMessage(int id) {
 		Message  msg = null;
-		Document doc = mongodbCollection.find(eq(_msgId, id)).first();
+		Document doc = mongodbCollection.find(eq(_msgId, Long.valueOf(id))).first();
 
 		if (doc != null) {
-			msg = new Message(doc.getInteger(_msgId), doc.getString(_msg));
+			msg = new StoredMessage(doc.getLong(_msgId), doc.getString(_msg), doc.getString(_auth));
 		}
 
 		return msg;
@@ -114,36 +111,33 @@ public class MongoDatabaseImpl implements IMessageStore {
 	@Override
 	public Message createMessage(Message msg) {
 		// check if message id already exists
-		Bson filter = eq(_msgId, msg.getId());
-		if (mongodbCollection.find(filter).first() == null) {
-			Document doc = new Document();
-			doc.put(_msgId, msg.getId());
-			doc.put(_msg, msg.getMessage());
-			try {
-				mongodbCollection.insertOne(doc);
-			}
-			finally {
-				// TODO: define exception to throw or how to indicate unsuccessful op 
-			}
+		Document doc = new Document();
+		doc.put(_msgId, mongodbCollection.countDocuments() + 1); // potenital issue with deleted messages in the middle
+		doc.put(_msg, msg.getMessage());
+		doc.put(_auth, msg.getAuthor());
+		try {
+			mongodbCollection.insertOne(doc);
 		}
-		else {
-			// TODO: this should set descriptive message -- eg use update method instead
+		finally {
+			// TODO: define exception to throw or how to indicate unsuccessful op 
 		}
 		return msg;
 	}
 
 	@Override
 	public Message updateMessage(int id, Message msg) {
-		Bson filter = eq(_msgId, id);
-		Bson updateOperation = set(_msg, msg.getMessage());
+		Bson filter = eq(_msgId, Long.valueOf(id));
+		Bson updateMsg = set(_msg, msg.getMessage());
+		Bson updateAuth = set(_auth, msg.getAuthor());
+		Bson update = combine(updateMsg, updateAuth);
 		UpdateOptions options = new UpdateOptions().upsert(true); // this will insert new message if id not found
-		mongodbCollection.updateOne(filter, updateOperation, options); // does not throw
+		mongodbCollection.updateOne(filter, update, options); // does not throw
 		return msg;
 	}
 
 	@Override
 	public void deleteMessage(int id) {
-		Bson filter = eq(_msgId, id);
+		Bson filter = eq(_msgId, Long.valueOf(id));
 		try {
 			mongodbCollection.deleteOne(filter);		
 		}

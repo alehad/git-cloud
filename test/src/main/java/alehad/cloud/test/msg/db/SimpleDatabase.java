@@ -6,10 +6,11 @@ import java.util.ListIterator;
 
 import alehad.cloud.test.msg.model.IMessageStore;
 import alehad.cloud.test.msg.model.Message;
+import alehad.cloud.test.msg.model.StoredMessage;
 
 public class SimpleDatabase implements IMessageStore {
 
-	private List<Message> messages = new ArrayList<Message>();
+	private List<StoredMessage> messages = new ArrayList<StoredMessage>();
 	
 	private static SimpleDatabase instance;
 	
@@ -22,23 +23,23 @@ public class SimpleDatabase implements IMessageStore {
 
 	private SimpleDatabase() {
 		// initiate message list with couple of messages
-		messages.add(new Message(1, "hello!"));
-		messages.add(new Message(2, "hi there!"));
-		messages.add(new Message(3, "yuhuuu!"));  // very important change! : )
+		//messages.add(new Message("hello!"));
+		//messages.add(new Message("hi there!"));
 	}
 
 	@Override
-	public List<Message> getMessages() {
+	public List<StoredMessage> getMessages() {
 		return messages;
 	}
 
 	@Override
 	public Message getMessage(int id) {
 		Message message = null;
-		ListIterator<Message> iterator = instance.messages.listIterator();
+		ListIterator<StoredMessage> iterator = instance.messages.listIterator();
+		int storedMsgId = 1; // naive implementation to support Message refactoring
 		while (iterator.hasNext()) {
 			message = iterator.next();
-			if (message.getId() == id) {
+			if (storedMsgId++ == id) {
 				break;
 			}
 		}
