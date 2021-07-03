@@ -33,7 +33,7 @@ public class SimpleDatabase implements IMessageStore {
 	}
 
 	@Override
-	public Message getMessage(long id) {
+	public Message getMessage(int id) {
 		Message message = null;
 		ListIterator<Message> iterator = instance.messages.listIterator();
 		while (iterator.hasNext()) {
@@ -53,13 +53,13 @@ public class SimpleDatabase implements IMessageStore {
 	}
 
 	@Override
-	public Message updateMessage(long id, Message msg) {
+	public Message updateMessage(int id, Message msg) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void deleteMessage(long id) {
+	public void deleteMessage(int id) {
 		// TODO Auto-generated method stub
 		
 	}

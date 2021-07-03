@@ -94,7 +94,7 @@ public class MongoDatabaseImpl implements IMessageStore {
 	}
 
 	@Override
-	public Message getMessage(long id) {
+	public Message getMessage(int id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -106,13 +106,13 @@ public class MongoDatabaseImpl implements IMessageStore {
 	}
 
 	@Override
-	public Message updateMessage(long id, Message msg) {
+	public Message updateMessage(int id, Message msg) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void deleteMessage(long id) {
+	public void deleteMessage(int id) {
 		// TODO Auto-generated method stub
 		
 	}
