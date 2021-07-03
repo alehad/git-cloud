@@ -14,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 
 import alehad.cloud.test.msg.model.IMessageStore;
 import alehad.cloud.test.msg.model.Message;
+import alehad.cloud.test.msg.model.StoredMessage;
 
 @Path("messages")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -30,7 +31,7 @@ public class MessageRequestHandler {
 	}
 	
 	@GET
-	public List<Message> getMessages() {
+	public List<StoredMessage> getMessages() {
 		return messageStore.getMessages();
 	}
 

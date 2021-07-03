@@ -6,7 +6,7 @@ public interface IMessageStore {
 	
 	// basic CRUD operations
 	
-	public List<Message> getMessages();
+	public List<StoredMessage> getMessages();
 	
 	public Message getMessage(int id);
 	

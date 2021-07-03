@@ -2,23 +2,21 @@ package alehad.cloud.test.msg.model;
 
 public class Message {
 
-	private int 	id;
 	private String 	message;
+	private String  author;
 	
 	public Message() {
 		//no-op default constructor
 	}
 	
-	public Message(int id, String message) {
-		this.id 	 = id;
+	public Message(String message) {
 		this.message = message;
+		this.author  = "le moi!";
 	}
 
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
+	public Message(String message, String author) {
+		this.message = message;
+		this.author  = author;
 	}
 
 	public String getMessage() {
@@ -27,5 +25,12 @@ public class Message {
 	public void setMessage(String message) {
 		this.message = message;
 	}
-	
+
+	public String getAuthor() {
+		return author;
+	}
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+
 }
