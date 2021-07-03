@@ -1,5 +1,6 @@
 package alehad.cloud.test.msg.res;
 
+import alehad.cloud.test.msg.db.MongoDatabaseImpl;
 import alehad.cloud.test.msg.db.SimpleDatabase;
 import alehad.cloud.test.msg.model.IMessageStore;
 
@@ -12,6 +13,7 @@ public class MessageStoreFactory {
 	
 	public IMessageStore initializeMessageStore() {
 		// create simple database for now
-		return SimpleDatabase.getInstance();
+		//return SimpleDatabase.getInstance();
+		return MongoDatabaseImpl.getInstance();
 	}
 }
