@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
@@ -11,6 +12,11 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
+
+import com.mongodb.client.model.UpdateOptions;
+
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Updates.*;
 
 import alehad.cloud.test.msg.model.IMessageStore;
 import alehad.cloud.test.msg.model.Message;
@@ -95,26 +101,54 @@ public class MongoDatabaseImpl implements IMessageStore {
 
 	@Override
 	public Message getMessage(int id) {
-		// TODO Auto-generated method stub
-		return null;
+		Message  msg = null;
+		Document doc = mongodbCollection.find(eq(_msgId, id)).first();
+
+		if (doc != null) {
+			msg = new Message(doc.getInteger(_msgId), doc.getString(_msg));
+		}
+
+		return msg;
 	}
 
 	@Override
 	public Message createMessage(Message msg) {
-		// TODO Auto-generated method stub
-		return null;
+		// check if message id already exists
+		Bson filter = eq(_msgId, msg.getId());
+		if (mongodbCollection.find(filter).first() == null) {
+			Document doc = new Document();
+			doc.put(_msgId, msg.getId());
+			doc.put(_msg, msg.getMessage());
+			try {
+				mongodbCollection.insertOne(doc);
+			}
+			finally {
+				// TODO: define exception to throw or how to indicate unsuccessful op 
+			}
+		}
+		else {
+			// TODO: this should set descriptive message -- eg use update method instead
+		}
+		return msg;
 	}
 
 	@Override
 	public Message updateMessage(int id, Message msg) {
-		// TODO Auto-generated method stub
-		return null;
+		Bson filter = eq(_msgId, id);
+		Bson updateOperation = set(_msg, msg.getMessage());
+		UpdateOptions options = new UpdateOptions().upsert(true); // this will insert new message if id not found
+		mongodbCollection.updateOne(filter, updateOperation, options); // does not throw
+		return msg;
 	}
 
 	@Override
 	public void deleteMessage(int id) {
-		// TODO Auto-generated method stub
-		
+		Bson filter = eq(_msgId, id);
+		try {
+			mongodbCollection.deleteOne(filter);		
+		}
+		finally {
+		}
 	}
 	
 }
