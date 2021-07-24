@@ -51,7 +51,10 @@ public class MongoDatabaseImpl implements IMessageStore {
 	
 	private MongoDatabaseImpl() {
 		// will need to update host/port once moving to K8
-		mongodbClient = new MongoClient("localhost", 27017);
+		// in order for this to work, compose.yaml has to have hostname: mongo-db
+		// specified for the service: mongo
+		// this will create DNS name of mongo-db for the mongo running inside docker network
+		mongodbClient = new MongoClient("mongo-db", 27017);
 		
 		mongodb = mongodbClient.getDatabase(_mongodbName); // if not present, Mongo will create it
 		// do we need to authenticate?
