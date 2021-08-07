@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      #hostname: mongo-db
+      containers:
+      - name: mongodb
+        image: mongo
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 27017
+        #env:
+         # - name: MONGO_INITDB_ROOT_USERNAME
+         #   value: ''
+         # - name: MONGO_INITDB_ROOT_PASSWORD
+         #   value: ''
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-db #this is the name accessible within the node, similar to 'hostname' in docker-compose
+spec:
+  selector:
+    app: mongodb
+  ports:
+    - protocol: TCP
+      name: default-mongo
+      port: 27017 #this is the port that service [in fact mongo db] will be accessible through
+      targetPort: 27017 #this needs to match the container/pod port from section above
+    - protocol: TCP
+      name: express-mongo
+      port: 27018 #extra port opened for mongo express to work together with test app -- it did not work!
+      targetPort: 27017 #this needs to match the container/pod port from section above      

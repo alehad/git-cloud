@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alehad-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alehad-test
+  template:
+    metadata:
+      labels:
+        app: alehad-test
+    spec:
+      containers:
+      - name: alehad-test
+        image: test:k8-v1    # To point your shell to minikube’s docker-daemon, run:
+                             # eval $(minikube -p minikube docker-env)
+                             # then follow this with docker build . -t test:k8-v1 to build the image in minikube repo
+        imagePullPolicy: Never #this will pull in image from local minikube repository
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alehad-test-service
+spec:
+  selector:
+    app: alehad-test
+  type: LoadBalancer #this type denotes that this is External Service, together with the nodePort below
+  ports:
+    - protocol: TCP
+      name: alehad-test-service
+      port: 8080
+      targetPort: 8080
+      nodePort: 30880 #external port that the node can be accessed through via browser etc, cannot create same node port twice
