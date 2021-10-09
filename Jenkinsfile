@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         registry = 'alehad/msgr-test'
-        jenkins_credentials = 'hub.docker.id' // docker hub user defined in jenkins credentials
+        jenkins_credentials = 'hub.docker.id'
         app_docker_image = ''
     }
     stages {
@@ -32,8 +32,9 @@ pipeline {
             agent { label 'master' }
             steps {
                 script {
-                    docker.withRegistry('', 'hub.docker.id')
-                    app_docker_image.push()
+                    docker.withRegistry('', jenkins_credentials) {
+                        app_docker_image.push()
+                    }
                 }
             }
         }
