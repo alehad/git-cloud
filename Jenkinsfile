@@ -32,7 +32,7 @@ pipeline {
             agent { label 'master' }
             steps {
                 script {
-                    docker.withRegistry('', jenkins_credentials)
+                    docker.withRegistry('', 'hub.docker.id')
                     app_docker_image.push()
                 }
             }
