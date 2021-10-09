@@ -5,10 +5,17 @@ pipeline {
         }
     }
     stages {
-        stage('build') {
+        stage('build test project') {
             steps {
                 dir('test') {
                     sh 'mvn -B -DskipTests clean package'
+                }
+            }
+        }
+        stage('create docker image') {
+            steps {
+                dir('test') {
+                    sh 'docker build -t alehad/msgr-test:lts .'
                 }
             }
         }
