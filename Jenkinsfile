@@ -1,4 +1,5 @@
 pipeline {
+    agent any
     environment {
         registry = 'alehad/msgr-test'
         jenkins_credentials = 'hub.docker.id' // user defined in jenkins credentials
