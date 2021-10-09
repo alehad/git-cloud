@@ -1,8 +1,0 @@
-pipeline {
-    agent any
-    stages {
-        stage ("build messenger project") {
-            echo 'need to configure app build...'
-        }
-    }
-}
